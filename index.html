@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Benni | Developer & Creator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2h8iL+9zTfQ+j6F5Z0I6A7Bv0J5r4qfA9+4G7/A4K+O4p+9E6e/l2N+tA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* --- GRUNDEINSTELLUNGEN & DESIGN --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --dark-bg: #121212;
+            --primary-text: #e0e0e0;
+            --dark-card: #1a1a1a;
+            --accent-yellow: #FFD700;
+            --accent-yellow-transparent: rgba(255, 215, 0, 0.1);
+            --shadow-color: rgba(255, 215, 0, 0.5);
+            /* LOADER Variablen */
+            --loader-color: #4a90e2; /* Cooler Blauton für Loader */
+            --loader-bg: #181818; /* Dunkler Background für Loader */
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, rgba(255, 255, 255, 0) 1px);
+            background-size: 20px 20px;
+            color: var(--primary-text);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* ------------------------------------------- */
+        /* PC-spezifische Stile, die auf Mobilgeräten entfernt oder angepasst werden */
+        /* ------------------------------------------- */
+
+        /* Der Blob-Effekt (Nur PC) */
+        #blob {
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 60%);
+            height: 300px;
+            width: 300px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Partikel-Hintergrund im Loader (Nur PC) */
+        #loader-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1999;
+            background: transparent;
+            pointer-events: none;
+        }
+        
+        /* ------------------------------------------- */
+        /* Ende der PC-spezifischen Stile */
+        /* ------------------------------------------- */
+
+        /* --- NAVIGATIONSLEISTE (Mobile-Optimierung durch CSS-Media-Query) --- */
+        #menu-toggle {
+            display: none;
+        }
+
+        .menu-button-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            height: 50px;
+            width: 50px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-button,
+        .menu-button::before,
+        .menu-button::after {
+            display: block;
+            background-color: var(--accent-yellow);
+            position: absolute;
+            height: 4px;
+            width: 30px;
+            transition: transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 2px;
+        }
+
+        .menu-button::before {
+            content: '';
+            margin-top: -8px;
+        }
+
+        .menu-button::after {
+            content: '';
+            margin-top: 8px;
+        }
+
+        #menu-toggle:checked + .menu-button-container .menu-button {
+            background: rgba(255, 255, 255, 0);
+        }
+
+        #menu-toggle:checked + .menu-button-container .menu-button::before {
+            margin-top: 0px;
+            transform: rotate(405deg);
+        }
+
+        #menu-toggle:checked + .menu-button-container .menu-button::after {
+            margin-top: 0px;
+            transform: rotate(-405deg);
+        }
+
+        #side-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 250px;
+            height: 100%;
+            background-color: var(--dark-card);
+            box-shadow: -5px 0px 15px rgba(0,0,0,0.5);
+            z-index: 1000;
+            transition: right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            padding-top: 80px;
+        }
+
+        #menu-toggle:checked ~ #side-menu {
+            right: 0;
+        }
+
+        #side-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #side-menu li {
+            padding: 20px;
+            text-align: center;
+        }
+
+        #side-menu a {
+            color: var(--accent-yellow);
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: letter-spacing 0.3s ease;
+        }
+
+        #side-menu a:hover {
+            letter-spacing: 2px;
+        }
+
+        /* --- CONTAINER --- */
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            text-align: center;
+        }
+
+        /* --- TEXT --- */
+        h1 {
+            font-size: 3.5em;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 8px var(--shadow-color);
+            margin-bottom: 0;
+        }
+
+        h1 + p {
+            font-size: 1.2em;
+            margin-top: 5px;
+            font-weight: 300;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 5px var(--shadow-color);
+            border-bottom: 2px solid var(--accent-yellow-transparent);
+            padding-bottom: 10px;
+            margin-top: 60px;
+        }
+
+        /* --- BUTTON --- */
+        .cta-button {
+            display: inline-block;
+            background-color: transparent;
+            border: 2px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+            padding: 12px 25px;
+            margin-top: 20px;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent-yellow);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--shadow-color), 0 0 25px var(--shadow-color);
+            transform: translateY(-3px);
+        }
+
+        /* --- Updated Contact Section Styles --- */
+        .contact-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        /* Ändern Sie .link-card von div zu a */
+        .link-card {
+            background-color: var(--dark-card);
+            border: 1px solid var(--accent-yellow);
+            border-radius: 10px;
+            padding: 20px;
+            width: calc(50% - 10px); /* 2 Karten pro Reihe, mit etwas Abstand */
+            max-width: 350px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            
+            /* Neue Regeln für das a-Tag oder div, um es wie eine div-Karte zu stylen */
+            display: block; /* Wichtig, damit es die Größe der Karte annimmt */
+            text-decoration: none; /* Entfernt die Unterstreichung */
+            color: var(--primary-text); /* Stellt die Textfarbe wieder her */
+            cursor: pointer;
+        }
+
+        /* Fügt den Pointer-Cursor auch für die 'div'-basierten Karten hinzu */
+        .link-card.email-card {
+            cursor: pointer;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px var(--shadow-color);
+        }
+
+        .link-card h3 {
+            margin-top: 0;
+            color: var(--accent-yellow);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+        }
+
+        .link-card h3 i {
+            margin-right: 10px;
+            font-size: 1.4em;
+        }
+
+        /* Entfernt die sichtbare URL/E-Mail-Adresse unter dem Titel */
+        .link-card .link-text {
+            color: var(--primary-text);
+            font-weight: 400;
+            display: block;
+            margin-top: 10px;
+            word-wrap: break-word; 
+            /* Macht den Text selbst unsichtbar, behält aber die Struktur bei */
+            display: none; 
+        }
+        
+        /* Sorgt dafür, dass der "Coming Soon" Text sichtbar bleibt */
+        .coming-soon {
+            display: block;
+            color: #777;
+            font-style: italic;
+        }
+
+        /* --- TOAST NOTIFICATION STYLES --- */
+        #toast-notification {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: var(--dark-card);
+            color: var(--primary-text);
+            text-align: center;
+            border-radius: 5px;
+            padding: 16px;
+            position: fixed;
+            z-index: 10000;
+            left: 50%;
+            bottom: 30px;
+            font-size: 1em;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            border: 1px solid var(--accent-yellow);
+            transition: opacity 0.5s ease-out;
+            opacity: 0;
+        }
+
+        #toast-notification.show {
+            visibility: visible;
+            opacity: 1;
+            /* Animation für das Auftauchen von unten */
+            animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
+        }
+
+        @keyframes fadeIn {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadeOut {
+            from {opacity: 1;}
+            to {opacity: 0;}
+        }
+
+        /* ------------------------------------------- */
+        /* Mobil-Optimierung: Karten werden auf 100% Breite gesetzt */
+        @media (max-width: 600px) {
+            .link-card {
+                width: 100%;
+            }
+        }
+        /* ------------------------------------------- */
+
+        /* --- FOOTER --- */
+        footer {
+            margin-top: 80px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* --- LOADER STYLES --- */
+        #loader-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: var(--loader-bg);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            opacity: 1; /* Initial sichtbar */
+            transition: opacity 0.6s ease;
+        }
+
+        #loader-text {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: var(--loader-color);
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 1.2px;
+        }
+
+        /* Loader Kreis Animation */
+        .loader-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            animation: rotate 1.5s linear infinite;
+            border: 6px solid transparent;
+            border-top-color: var(--loader-color);
+            border-bottom-color: var(--loader-color);
+        }
+
+        /* Mini Segmente am Rand (vier Stück) */
+        .loader-ring::before, .loader-ring::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin: -8px 0 0 -8px;
+            box-shadow:
+                28px 0 0 var(--loader-color),
+                0 28px 0 var(--loader-color),
+                -28px 0 0 var(--loader-color),
+                0 -28px 0 var(--loader-color);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .loader-ring::after {
+            animation-delay: 0.75s;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader-overlay">
+        <canvas id="loader-canvas" width="window.innerWidth" height="window.innerHeight"></canvas>
+        <div class="loader-ring"></div>
+        <div id="loader-text">Bitte warten Sie kurz...</div>
+    </div>
+
+    <div id="blob"></div>
+
+    <input id="menu-toggle" type="checkbox" />
+    <label class='menu-button-container' for="menu-toggle">
+        <div class='menu-button'></div>
+    </label>
+    <nav id="side-menu">
+        <ul>
+            <li><a href="#about">Über Mich</a></li>
+            <li><a href="#project">VoidStorm Projekt</a></li>
+            <li><a href="#plugins">Custom Plugins</a></li>
+            <li><a href="#contact">Kontakt</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+
+        <header>
+            <h1>Benni</h1>
+            <p>Java & JavaScript Developer</p>
+        </header>
+
+        <section id="about">
+            <h2>Über Mich</h2>
+            <p>
+                Hi! Ich bin Benni, 12 Jahre alt und begeisterter Programmierer.
+                Ich entwickle hauptsächlich in **Java** und **JavaScript** und liebe es, neue Projekte zu starten und Herausforderungen zu meistern.
+            </p>
+        </section>
+
+        <section id="project">
+            <h2>Minecraft Projekt: VoidStorm</h2>
+            <p>
+                Ich leite den Minecraft Server VoidStorm. Wir sind eine wachsende Community und freuen uns immer über neue Mitglieder. Komm gerne drauf wir freuen uns auf dich!
+            </p>
+            <a href="https://discord.gg/Q6C9mypF8g" target="_blank" class="cta-button">
+                Tritt unserem Discord bei!
+            </a>
+        </section>
+
+        <section id="plugins">
+            <h2>Custom Minecraft Plugins</h2>
+            <p>
+                Du benötigst ein spezielles Plugin für deinen Minecraft-Server? Kein Problem!
+                Ich programmiere individuelle Plugins nach deinen Wünschen. Für Anfragen schreib mir am besten direkt auf Discord!
+            </p>
+        </section>
+
+        <section id="contact">
+            <h2>Kontakt & Links</h2>
+            <p>Hier findest du alle wichtigen Links und Kontaktmöglichkeiten.</p>
+            
+            <div class="contact-cards">
+                
+                <a href="https://discord.com/users/1200453864017637448" target="_blank" class="link-card">
+                    <h3><i class="fab fa-discord"></i> Mein Discord Profil</h3>
+                    <span class="link-text">Benni auf Discord</span>
+                </a>
+                
+                <div class="link-card email-card" onclick="copyEmailToClipboard('business.zippy953@simplelogin.com')">
+                    <h3><i class="fas fa-envelope"></i> Business Mail</h3>
+                    <span class="link-text" data-email="business.zippy953@simplelogin.com">business.zippy953@simplelogin.com</span>
+                </div>
+                
+                <a href="https://discord.gg/Q6C9mypF8g" target="_blank" class="link-card">
+                    <h3><i class="fas fa-server"></i> Minecraft Projekt (VoidStorm)</h3>
+                    <span class="link-text">VoidStorm Discord</span>
+                </a>
+                
+                <div class="link-card email-card" onclick="copyEmailToClipboard('bugreport.stuffing829@dralias.com')">
+                    <h3><i class="fas fa-bug"></i> Bug Report</h3>
+                    <span class="link-text" data-email="bugreport.stuffing829@dralias.com">bugreport.stuffing829@dralias.com</span>
+                </div>
+                
+                <div class="link-card email-card" onclick="copyEmailToClipboard('hacks.unfold604@slmail.me')">
+                    <h3><i class="fas fa-gamepad"></i> Roblox Hacks Anfrage</h3>
+                    <span class="link-text" data-email="hacks.unfold604@slmail.me">hacks.unfold604@slmail.me</span>
+                </div>
+                
+                <div class="link-card">
+                    <h3><i class="fas fa-shopping-cart"></i> Mein Shop</h3>
+                    <span class="coming-soon">Coming Soon...</span>
+                </div>
+                
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        &copy; 2025 Benni. Alle Rechte vorbehalten.
+    </footer>
+
+    <div id="toast-notification">Zwischenablage gespeichert!</div>
+
+    <script>
+        // --- GERÄTEDETEKTION ---
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.matchMedia("(max-width: 768px)").matches;
+
+        // --- GLOBALE FUNKTIONEN ---
+        function showToast(message) {
+            const toast = document.getElementById("toast-notification");
+            toast.textContent = message;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        // --- CLIPBOARD COPY FUNCTION ---
+        function copyEmailToClipboard(email) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(email)
+                    .then(() => {
+                        showToast("E-Mail in Zwischenablage gespeichert!");
+                    })
+                    .catch(err => {
+                        console.error('Kopieren fehlgeschlagen:', err);
+                        fallbackCopyTextToClipboard(email);
+                    });
+            } else {
+                fallbackCopyTextToClipboard(email);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast("E-Mail in Zwischenablage gespeichert!");
+                } else {
+                    alert("Kopieren fehlgeschlagen. Bitte kopieren Sie die E-Mail manuell: " + text);
+                }
+            } catch (err) {
+                console.error('Fallback-Kopieren fehlgeschlagen:', err);
+                alert("Kopieren fehlgeschlagen. Bitte kopieren Sie die E-Mail manuell: " + text);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // --- LOADER LOGIC (aus Code 1) ---
+        window.addEventListener('load', () => {
+            // Nach 3 Sekunden verschwindet der Loader
+            setTimeout(() => {
+                const loaderOverlay = document.getElementById('loader-overlay');
+                loaderOverlay.style.transition = 'opacity 0.6s ease';
+                loaderOverlay.style.opacity = '0';
+                
+                setTimeout(() => {
+                    loaderOverlay.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Reaktiviert Scrollen für den Body
+                }, 600); 
+            }, 3000); 
+        });
+
+        // -------------------------------------------
+        // BLOB & PARTIKEL NUR AUF PC AKTIVIEREN
+        // -------------------------------------------
+
+        if (!isMobile) {
+            // --- BLOB-ANIMATION (NUR FÜR PC) ---
+            const blob = document.getElementById('blob');
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let blobX = mouseX;
+            let blobY = mouseY;
+
+            window.addEventListener('mousemove', e => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function animateBlob() {
+                // Widerstand - langsames Folgen
+                blobX += (mouseX - blobX) * 0.05;
+                blobY += (mouseY - blobY) * 0.05;
+                // Position zentrieren: blob ist 300x300, also Hälfte 150
+                blob.style.left = `${blobX - 150}px`;
+                blob.style.top = `${blobY - 150}px`;
+                requestAnimationFrame(animateBlob);
+            }
+            animateBlob();
+
+            // --- PARTIKEL-HINTERGRUND IM LOADER (NUR FÜR PC) ---
+            const canvas = document.getElementById('loader-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+
+                let width = window.innerWidth;
+                let height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+
+                const particleCount = 80;
+                const particles = [];
+
+                class Particle {
+                    constructor() {
+                        this.reset();
+                    }
+                    reset() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.size = 1 + Math.random() * 2;
+                        this.speedX = (Math.random() - 0.5) * 0.5;
+                        this.speedY = (Math.random() - 0.5) * 0.5;
+                        this.alpha = 0.2 + Math.random() * 0.4;
+                    }
+                    update() {
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+
+                        if (this.x < 0 || this.x > width) this.speedX = -this.speedX;
+                        if (this.y < 0 || this.y > height) this.speedY = -this.speedY;
+
+                        // Alpha pulsieren
+                        this.alpha += (Math.random() - 0.5) * 0.05;
+                        if (this.alpha > 0.6) this.alpha = 0.6;
+                        if (this.alpha < 0.2) this.alpha = 0.2;
+                    }
+                    draw() {
+                        ctx.beginPath();
+                        ctx.fillStyle = `rgba(74,144,226,${this.alpha.toFixed(2)})`; 
+                        ctx.shadowColor = 'rgba(74,144,226,0.6)';
+                        ctx.shadowBlur = 6;
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                function initParticles() {
+                    for (let i = 0; i < particleCount; i++) {
+                        particles.push(new Particle());
+                    }
+                }
+
+                function animateParticles() {
+                    ctx.clearRect(0, 0, width, height);
+                    particles.forEach(p => {
+                        p.update();
+                        p.draw();
+                    });
+                    requestAnimationFrame(animateParticles);
+                }
+
+                window.addEventListener('resize', () => {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                });
+
+                initParticles();
+                animateParticles();
+            }
+
+        } else {
+            // --- Mobile-Gerät: Blob und Partikel deaktivieren ---
+            
+            // Verstecken des Blobs auf mobilen Geräten
+            const blobElement = document.getElementById('blob');
+            if (blobElement) {
+                blobElement.style.display = 'none';
+            }
+
+            // Partikel-Canvas entfernen oder verstecken
+            const canvasElement = document.getElementById('loader-canvas');
+            if (canvasElement) {
+                canvasElement.remove();
+            }
+        }
+    </script>
+</body>
+</html>
